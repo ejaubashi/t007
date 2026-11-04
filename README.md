@@ -43,7 +43,7 @@ Tests use `/usr/bin/chromium` when available, otherwise Playwright's Chromium. `
 
 The screenshots in `public/images` are clean crops from the user-supplied recordings, with browser chrome excluded. The logo, spacecraft, robot and planet are locally reconstructed procedural geometry, not the original site's 3D assets. The transformation is a stylized transition between these reconstructed forms. Ambient audio is synthesized locally; it is not the original soundtrack. The About copy, detail explanations and unrecorded planet interaction are representative additions. Day mode changes the presentation; the original site's professional-work collection was not available in the supplied recordings.
 
-This is a frontend implementation. It has no accounts, backend or external API requirements. Nothing has been deployed or published by this project.
+This is a frontend implementation. It has no accounts, backend or external API requirements. The source is on `main`; the static GitHub Pages build is on `gh-pages`.
 
 ## GitHub Pages
 
