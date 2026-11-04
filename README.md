@@ -43,15 +43,15 @@ Tests use `/usr/bin/chromium` when available, otherwise Playwright's Chromium. `
 
 The screenshots in `public/images` are clean crops from the user-supplied recordings, with browser chrome excluded. The logo, spacecraft, robot and planet are locally reconstructed procedural geometry, not the original site's 3D assets. The transformation is a stylized transition between these reconstructed forms. Ambient audio is synthesized locally; it is not the original soundtrack. The About copy, detail explanations and unrecorded planet interaction are representative additions. Day mode changes the presentation; the original site's professional-work collection was not available in the supplied recordings.
 
-This is a frontend implementation. It has no accounts, backend or external API requirements. The source is on `main`; the static GitHub Pages build is on `gh-pages`.
+This is a frontend implementation. It has no accounts, backend or external API requirements. The development entry point is `src/index.html`. The root `index.html` and the `assets`, `images`, `fs45`, and `universe` directories are the compiled Pages site, also mirrored to `gh-pages`.
 
 ## GitHub Pages
 
 `npm run build:pages` builds for the project URL `/t007/` and creates real HTML
 entry points for each route so direct links and refreshes work on GitHub Pages.
-Publish the contents of `dist` at the root of the `gh-pages` branch. In repository
+This command also refreshes the compiled site at the repository root so Pages can serve `main` directly. The contents of `dist` can also be published at the root of the `gh-pages` branch. In repository
 Settings → Pages, the publishing source must be **Deploy from a branch**,
-branch **gh-pages**, folder **/ (root)**.
+branch **main** or **gh-pages**, folder **/ (root)**. Both branches include the compiled site.
 
 Expected project URL, once Pages is enabled and deployment completes:
 `https://ejaubashi.github.io/t007/`.
