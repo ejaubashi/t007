@@ -17,11 +17,12 @@ Use the existing checkout for development; no additional Git worktree is needed.
 
 ## Included
 
-- Day/night home, persistent color preference, floating metallic logo and atmospheric background.
+- Day/night home, persistent color preference, rounded metallic logo and atmospheric background.
 - Project gallery and an About section.
 - FS-45 presentation with Ship, Build, Detail, Engines and Cockpit sections.
 - Build-stage slider, detail dialogs and expanded cockpit view.
-- Three.js spaceship/robot viewer: animated form switching, orbit, zoom, reset and fullscreen.
+- Three.js spaceship/robot viewer: a tapered hull, recessed canopy, fitted robot armor, animated form switching, orbit, zoom, reset and fullscreen.
+- Custom studio reflections, rectangular soft lights, soft contact shadows and restrained navigation-light accents. Rendering pauses when a scene is offscreen.
 - Interactive planet scene and opt-in synthesized ambient sound.
 - Mobile layouts, keyboard focus styles, native modal dialogs and reduced-motion support.
 

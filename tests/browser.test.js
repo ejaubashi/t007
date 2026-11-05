@@ -19,8 +19,9 @@ before(async () => {
 after(async () => { await browser?.close(); server?.kill(); });
 
 for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
-  test(`Complete portfolio flow at ${viewport.width}px`, async () => {
+  test(`Complete portfolio flow at ${viewport.width}px`, async (t) => {
     const page = await browser.newPage({ viewport });
+    t.after(() => page.close());
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     const failedImages = [];
