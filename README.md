@@ -21,13 +21,13 @@ Use the existing checkout for development; no additional Git worktree is needed.
 - Project gallery and an About section.
 - FS-45 presentation with Ship, Build, Detail, Engines and Cockpit sections.
 - Build-stage slider, detail dialogs and expanded cockpit view.
-- Three.js spaceship/robot viewer: a tapered hull, recessed canopy, fitted robot armor, animated form switching, orbit, zoom, reset and fullscreen.
+- A three-craft fleet viewer: Origin FS–45 stealth craft, Asterion VX–02 ring-drive explorer, and Spectre XR–07 twin-hull interceptor. Each has its own procedural geometry, materials and accent lighting, with orbit, zoom, reset and fullscreen controls. Craft selection reuses the renderer and is stored in the URL.
 - Custom studio reflections, rectangular soft lights, soft contact shadows and restrained navigation-light accents. Rendering pauses when a scene is offscreen.
 - Interactive planet scene and opt-in synthesized ambient sound.
 - Mobile layouts, keyboard focus styles, native modal dialogs and reduced-motion support.
 
-Routes: `/`, `/#work`, `/#about`, `/fs45/`, `/fs45/transform/`, `/universe/`.
-Production hosting must rewrite these routes to `index.html` (SPA fallback).
+Routes: `/`, `/#work`, `/#about`, `/fs45/`, `/fleet/fs45/`, `/fleet/asterion/`, `/fleet/spectre/`, `/universe/`.
+GitHub Pages builds include static entry points for every route. Earlier viewer URLs redirect to the fleet.
 
 ## Validation
 
@@ -38,13 +38,13 @@ npm test
 npm run build
 ```
 
-Tests use `/usr/bin/chromium` when available, otherwise Playwright's Chromium. `CHROMIUM_PATH` can select another installed executable. The browser suite starts and stops its own Vite server at port 4174 and exercises the desktop and mobile flows, themes, WebGL initialization, dialogs, stage slider, navigation, viewer form switching and missing-resource/runtime-error checks.
+Tests use `/usr/bin/chromium` when available, otherwise Playwright's Chromium. `CHROMIUM_PATH` can select another installed executable. The browser suite starts and stops its own Vite server at port 4174 and exercises the desktop and mobile flows, themes, WebGL initialization, dialogs, stage slider, navigation, fleet selection, craft reloads, legacy viewer redirects and missing-resource/runtime-error checks.
 
 ## Fidelity and assets
 
-The screenshots in `public/images` are clean crops from the user-supplied recordings, with browser chrome excluded. The logo, spacecraft, robot and planet are locally reconstructed procedural geometry, not the original site's 3D assets. The transformation is a stylized transition between these reconstructed forms. Ambient audio is synthesized locally; it is not the original soundtrack. The About copy, detail explanations and unrecorded planet interaction are representative additions. Day mode changes the presentation; the original site's professional-work collection was not available in the supplied recordings.
+The screenshots in `public/images` are clean crops from the user-supplied recordings, with browser chrome excluded. The logo, spacecraft and planet use locally built procedural geometry. Asterion and Spectre are new designs. The fleet gallery images are actual renders of those models. Ambient audio is synthesized locally; it is not the original soundtrack. The About copy, detail explanations and unrecorded planet interaction are representative additions. Day mode changes the presentation; the original site's professional-work collection was not available in the supplied recordings.
 
-This is a frontend implementation. It has no accounts, backend or external API requirements. The development entry point is `src/index.html`. The root `index.html` and the `assets`, `images`, `fs45`, and `universe` directories are the compiled Pages site, also mirrored to `gh-pages`.
+This is a frontend implementation. It has no accounts, backend or external API requirements. The development entry point is `src/index.html`. The root `index.html` and the `assets`, `images`, `fs45`, `fleet`, and `universe` directories are the compiled Pages site, also mirrored to `gh-pages`.
 
 ## GitHub Pages
 

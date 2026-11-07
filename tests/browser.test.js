@@ -35,7 +35,7 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'day', 'Theme survives reload');
     await page.getByRole('button', { name: 'Night mode', exact: true }).click();
     await page.getByRole('button', { name: 'Work', exact: true }).click();
-    await page.getByRole('link', { name: /THE SPACESHIP/ }).click();
+    await page.getByRole('link', { name: /ORIGIN/ }).click();
     await page.waitForURL('**/fs45/');
     assert.equal(await page.locator('h1').textContent(), 'A spaceship built from my logo.');
     await page.getByRole('link', { name: 'build', exact: true }).click();
@@ -50,13 +50,21 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     await page.locator('dialog[open]').waitFor();
     await page.getByRole('button', { name: 'Close dialog' }).click();
     await page.getByRole('button', { name: 'Open 3D viewer' }).click();
-    await page.waitForURL('**/fs45/transform/');
+    await page.waitForURL('**/fleet/fs45/');
     await page.locator('canvas').waitFor();
-    const transformer = page.getByRole('button', { name: 'Transformer', exact: true });
-    await transformer.click();
-    assert.equal(await transformer.getAttribute('aria-pressed'), 'true');
-    await page.waitForTimeout(400);
-    assert.match(await page.locator('.scene').getAttribute('aria-label'), /transformer/);
+    await page.locator('canvas').evaluate(canvas=>canvas.dataset.persistent='yes');
+    for(const [id,label] of [['asterion','VX–02 Asterion'],['spectre','XR–07 Spectre'],['fs45','FS–45 Origin']]) {
+      const selection=page.getByRole('button',{name:label,exact:true});
+      await selection.click();await page.waitForURL(`**/fleet/${id}/`);
+      assert.equal(await selection.getAttribute('aria-pressed'),'true');
+      assert.equal(await page.locator('canvas').getAttribute('data-persistent'),'yes','Switching ships reuses the renderer');
+      assert.match(await page.locator('.scene').getAttribute('aria-label'),new RegExp(label.split(' ')[1]));
+    }
+    await page.getByRole('button',{name:'XR–07 Spectre',exact:true}).click();
+    await page.reload();
+    assert.equal(await page.getByRole('button',{name:'XR–07 Spectre',exact:true}).getAttribute('aria-pressed'),'true','Craft selection survives a direct reload');
+    assert.equal(await page.getByRole('button',{name:'Transformer',exact:true}).count(),0,'Removed mode is absent');
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Fleet viewer fits the viewport');
     const canvas = page.locator('canvas');
     const bounds = await canvas.boundingBox();
     await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
@@ -64,11 +72,20 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     await page.getByRole('button', { name: 'Reset view' }).click();
     await page.getByRole('button', { name: /SOUND/ }).click();
     assert.equal(await page.getByRole('button', { name: /SOUND/ }).getAttribute('aria-pressed'), 'true');
-    await page.getByRole('button', { name: /FS-45 BACK/ }).click();
-    await page.waitForURL('**/fs45/');
-    await page.getByRole('button', { name: 'FLYSHARE', exact: true }).first().click();
+    await page.getByRole('button', { name: /XR–07 BACK/ }).click();
     await page.waitForURL('**/#work');
-    await page.getByRole('link', { name: /THE FLYSHARE UNIVERSE/ }).click();
+    assert.equal(await page.locator('.fleet-card').count(),3);
+    for(const id of ['asterion','spectre']) {
+      await page.getByRole('link',{name:new RegExp(id,'i')}).first().click();
+      await page.waitForURL(`**/fleet/${id}/`);
+      await page.getByRole('button',{name:/BACK/}).click();
+      await page.waitForURL('**/#work');
+    }
+    await page.goto(origin+'/fs45/transform/');
+    await page.waitForURL('**/fleet/fs45/');
+    assert.match(await page.locator('h1').textContent(),/Origin/,'Earlier viewer links open the spacecraft fleet');
+    await page.goto(origin);
+    await page.getByRole('link', { name: /The Flyshare universe/ }).click();
     await page.waitForURL('**/universe/');
     await page.locator('canvas').waitFor();
     await page.getByRole('button', { name: /FLYSHARE BACK/ }).click();

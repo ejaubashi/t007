@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
 
-for (const route of ['', 'fs45/', 'fs45/transform/', 'universe/']) {
+for (const route of ['', 'fs45/', 'fs45/transform/', 'universe/', 'fleet/fs45/', 'fleet/asterion/', 'fleet/spectre/']) {
   test(`Pages serves compiled assets from main: /t007/${route}`, async () => {
     const html = await readFile(`${route}index.html`, 'utf8');
     // Serving the development index from main used to load JSX directly and

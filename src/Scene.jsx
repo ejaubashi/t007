@@ -2,7 +2,8 @@ import React, {useEffect, useRef} from 'react';
 import * as T from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniformsLib.js';
-import {createLogo, createShip, createRobot, createPlanet, ACCENT} from './objects.js';
+import {createLogo, createSpacecraft, createPlanet} from './objects.js';
+import {getCraft} from './fleet.js';
 
 RectAreaLightUniformsLib.init();
 function disposeModel(model){model.traverse(o=>{o.geometry?.dispose();if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();});}
@@ -47,8 +48,8 @@ function stage(scene) {
   return {ring,halo,texture};
 }
 
-export default function Scene({kind='logo',day=false,form='ship',interactive=false,onReady}) {
-  const ref=useRef(),formRef=useRef(form);formRef.current=form;
+export default function Scene({kind='logo',day=false,craft='fs45',interactive=false,onReady}) {
+  const ref=useRef(),craftRef=useRef(craft);craftRef.current=craft;
   useEffect(()=>{
     const el=ref.current;let renderer;
     try {renderer=new T.WebGLRenderer({alpha:true,antialias:true,powerPreference:'high-performance'});} catch {el.classList.add('no-webgl');return;}
@@ -59,11 +60,12 @@ export default function Scene({kind='logo',day=false,form='ship',interactive=fal
     const homePosition=new T.Vector3(kind==='logo'?0:6,kind==='logo'?0:4,kind==='logo'?8.5:9);
     camera.position.copy(homePosition);
     const environment=studioEnvironment(renderer,kind);scene.environment=environment.texture;lightRig(scene,day);
-    let model,ship,robot,platform;
+    let model,ship,platform;
+    let activeCraft=craftRef.current;
     if(kind==='logo') {model=createLogo(day);scene.add(model);}
     else if(kind==='universe') {model=createPlanet();scene.add(model);}
     else {
-      model=new T.Group();ship=createShip();robot=createRobot();robot.visible=false;model.add(ship,robot);scene.add(model);
+      model=new T.Group();ship=createSpacecraft(activeCraft);model.add(ship);scene.add(model);
       if(interactive) {
         platform=stage(scene);
         const positions=new Float32Array(450);for(let i=0;i<positions.length;i++)positions[i]=(Math.random()-.5)*65;
@@ -87,8 +89,8 @@ export default function Scene({kind='logo',day=false,form='ship',interactive=fal
     const observer=new ResizeObserver(resize);observer.observe(el);resize();
     let visible=true;const visibility=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;});visibility.observe(el);
     const motion=matchMedia('(prefers-reduced-motion: reduce)');
-    const cold=new T.Color(0x9fb5cf),warm=new T.Color(ACCENT);
-    let raf,last=0,lastShadow=0,progress=formRef.current==='robot'?1:0;
+    const accent=new T.Color(getCraft(activeCraft).accent);
+    let raf,last=0,lastShadow=0;
     const animate=time=>{
       raf=requestAnimationFrame(animate);
       if(!visible||document.hidden||time-last<32)return;
@@ -100,12 +102,14 @@ export default function Scene({kind='logo',day=false,form='ship',interactive=fal
         model.position.y=motion.matches?0:Math.sin(time*.0006)*.055;
       } else if(kind==='universe') {if(!motion.matches)model.rotation.y+=dt*.09;}
       else {
-        const target=formRef.current==='robot'?1:0;progress=motion.matches?target:T.MathUtils.damp(progress,target,4,dt);
-        ship.visible=progress<.998;robot.visible=progress>.002;
-        ship.scale.setScalar(Math.max(.001,1-progress));ship.position.y=.3+(motion.matches?0:Math.sin(time*.0009)*.055)+progress*.9;ship.rotation.z=progress*.5;
-        robot.scale.setScalar(Math.max(.001,progress*.86));robot.position.y=-.06;robot.rotation.y=(1-progress)*Math.PI*.35;
+        if(activeCraft!==craftRef.current) {
+          model.remove(ship);disposeModel(ship);activeCraft=craftRef.current;ship=createSpacecraft(activeCraft);ship.scale.setScalar(motion.matches?1:.86);model.add(ship);accent.set(getCraft(activeCraft).accent);renderer.shadowMap.needsUpdate=true;
+        }
+        const scale=T.MathUtils.damp(ship.scale.x,1,7,dt);ship.scale.setScalar(scale);
+        ship.position.y=.3+(motion.matches?0:Math.sin(time*.0009)*.055);
         if(!interactive){model.rotation.y=motion.matches?.3:time*.0001;model.rotation.x=.13;}
-        if(platform){platform.ring.material.color.lerpColors(cold,warm,progress);platform.halo.material.color.copy(platform.ring.material.color);}
+        if(platform){platform.ring.material.color.lerp(accent,.08);platform.halo.material.color.copy(platform.ring.material.color);}
+
       }
       controls?.update();renderer.render(scene,camera);
     };raf=requestAnimationFrame(animate);onReady?.();
@@ -115,5 +119,5 @@ export default function Scene({kind='logo',day=false,form='ship',interactive=fal
     };
   },[kind,interactive]);
   useEffect(()=>{ref.current?.dispatchEvent(new CustomEvent('scene-theme',{detail:day}));},[day]);
-  return <div ref={ref} className={`scene scene-${kind}`} role="img" aria-label={kind==='logo'?'Floating metallic Flyshare logo':kind==='universe'?'An orbiting planet':`Interactive FS-45 ${form==='robot'?'transformer':'spaceship'} model`}/>;
+  return <div ref={ref} className={`scene scene-${kind}`} role="img" aria-label={kind==='logo'?'Floating metallic Flyshare logo':kind==='universe'?'An orbiting planet':`Interactive ${getCraft(craft).name} ${getCraft(craft).code} spacecraft model`}/>;
 }
